@@ -737,7 +737,7 @@ DWORD WINAPI shader2(LPVOID lpvd) //ultimatequack payload (OC)
 			{
 				int index = y * screenWidth + x;
 
-				int fx = (int)((i ^ 4) + (i * 4) * sin(x + y | i & x));
+				int fx = (int)((i ^ 4) + (i * 4) * tan(x + y | i & x));
 
 				rgbquadCopy = rgbquad[index];
 
