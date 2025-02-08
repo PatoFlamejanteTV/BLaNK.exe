@@ -36,8 +36,8 @@
 
 
 // WinXP Thing
-
-WINBOOL CheckForWindowsXP() {
+/*BOOL CheckForWindowsXP() {
+	;
 	OSVERSIONINFOA osvi;
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOA));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
@@ -46,7 +46,7 @@ WINBOOL CheckForWindowsXP() {
 		return true;
 	}
 	return false;
-}
+}*/
 
 // Typedef's
 
@@ -122,9 +122,9 @@ namespace Colors
 	{
 		HSL hsl;
 
-		BYTE r = rgb.rgbRed + r + r;
-		BYTE g = rgb.rgbGreen + g + i;
-		BYTE b = rgb.rgbBlue + r + g + b;
+		BYTE r{};
+		BYTE g{};
+		BYTE b{};
 
 		FLOAT _r = (FLOAT)r / 255.f;
 		FLOAT _g = (FLOAT)g / 255.f;
@@ -606,7 +606,7 @@ DWORD WINAPI darken(LPVOID lpParam)  {
         sw = GetSystemMetrics(0), sh = GetSystemMetrics(1);
         xadd = sin(angle) * 20, yadd = tan(angle) * 10;
         BitBlt(hdc, xadd, yadd, sw, sh, hdc, 0, 0, SRCAND);
-        angle += M_PI / 10;
+        angle += 0.3;
         ReleaseDC(NULL, hdc);
         Sleep(10);
     }
@@ -737,7 +737,7 @@ DWORD WINAPI shader2(LPVOID lpvd) //ultimatequack payload (OC)
 			{
 				int index = y * screenWidth + x;
 
-				int fx = (int)((i ^ 4) + (i * 4) * tan(x + y | i & x));
+				int fx = (int)((i ^ 4) + (i * 4) * (sin(x + y | i & x))*10);
 
 				rgbquadCopy = rgbquad[index];
 
@@ -765,7 +765,165 @@ DWORD WINAPI beep1(LPVOID lpParam)
 	}
 }
 
+VOID WINAPI ci(int x, int y, int w, int h) // https://github.com/pankoza2-pl/GDI-and-Bytebeats/blob/main/I_Am_a_potato/Main.cpp
+{
+    HDC hdc = GetDC(0);
+    HRGN hrgn = CreateEllipticRgn(x, y, w + x, h + y);
+    SelectClipRgn(hdc, hrgn);
+    BitBlt(hdc, x, y, w, h, hdc, x, y, PATINVERT);
+    DeleteObject(hrgn);
+    ReleaseDC(NULL, hdc);
+}
+DWORD WINAPI fun1(LPVOID lpVoid) // https://github.com/pankoza2-pl/GDI-and-Bytebeats/blob/main/I_Am_a_potato/Main.cpp
+{
+    RECT rect;
+    GetWindowRect(GetDesktopWindow(), &rect);
+    int w = rect.right - rect.left - 500, h = rect.bottom - rect.top - 500;
 
+    for (int t = 0;; t++)
+    {
+        const int size = 1000;
+        int x = rand() % (w + size) - size / 2, y = rand() % (h + size) - size / 2;
+
+        for (int i = 0; i < size; i += 100)
+        {
+            ci(x - i / 2, y - i / 2, i, i);
+        }
+    }
+    //return 0x00;
+}
+DWORD WINAPI fun2(LPVOID lpVoid) // https://github.com/pankoza2-pl/GDI-and-Bytebeats/blob/main/I_Am_a_potato/Main.cpp
+{
+    int w = GetSystemMetrics(0);
+    int h = GetSystemMetrics(1);
+
+    for (int t = 0;; t++)
+    {
+        HDC hdc = GetDC(0);
+        BitBlt(hdc, 0, 0, w, h, hdc, -30, 0, SRCCOPY);
+        BitBlt(hdc, 0, 0, w, h, hdc, w - 30, 0, SRCCOPY);
+        BitBlt(hdc, 0, 0, w, h, hdc, 0, -30, SRCCOPY);
+        BitBlt(hdc, 0, 0, w, h, hdc, 0, h - 30, SRCCOPY);
+        BitBlt(hdc,
+            rand() % 25,
+            rand() % 25,
+            w,
+            h,
+            hdc,
+            rand() % 25,
+            rand() % 25,
+            NOTSRCERASE
+        );
+        HPEN hPen = CreatePen(PS_SOLID, 2, RGB(rand() % 256, rand() % 256, rand() % 256));
+        //HPEN hOldPen = SelectPen(hdc, hPen);
+        HBRUSH hBrush = CreateSolidBrush(RGB(rand() % 256, rand() % 256, rand() % 256));
+        //HBRUSH hOldBrush = SelectBrush(hdc, hBrush);
+        POINT vertices[] = {
+            {
+                rand() % w,
+                rand() % h
+            },
+            {
+                rand() % w,
+                rand() % h
+            },
+            {
+                rand() % w,
+                rand() % h
+            }
+        };
+        Polygon(hdc, vertices, sizeof(vertices) / sizeof(vertices[0]));
+        //SelectBrush(hdc, hOldBrush);
+        DeleteObject(hBrush);
+        //SelectPen(hdc, hOldPen);
+        DeleteObject(hPen);
+        ReleaseDC(0, hdc);
+    }
+    //return 0x00;
+}
+DWORD WINAPI fun3(LPVOID lpVoid) { // https://github.com/pankoza2-pl/GDI-and-Bytebeats/blob/main/I_Am_a_potato/Main.cpp
+    int w = GetSystemMetrics(0), h = GetSystemMetrics(1);
+    int signX = 1;
+    int signY = 1;
+    int signX1 = 1;
+    int signY1 = 1;
+    int incrementor = 10;
+    int x = 10;
+    int y = 10;
+    while (1) {
+        HDC hdc = GetDC(0);
+        x += incrementor * signX;
+        y += incrementor * signY;
+        int top_x = 0 + x;
+        int top_y = 0 + y;
+        int bottom_x = 100 + x;
+        int bottom_y = 100 + y;
+        HBRUSH brush = CreateSolidBrush(RGB(rand() % 255, rand() % 255, rand() % 255));
+        SelectObject(hdc, brush);
+        Ellipse(hdc, top_x, top_y, bottom_x, bottom_y);
+        if (y >= GetSystemMetrics(SM_CYSCREEN)) { signY = -1; }
+        if (x >= GetSystemMetrics(SM_CXSCREEN)) { signX = -1; }
+
+        if (y == 0) { signY = 1; }
+        if (x == 0) { signX = 1; }
+
+        Sleep(1);
+        DeleteObject(brush);
+        brush = CreateSolidBrush(RGB(rand() % 255, rand() % 255, rand() % 255));
+        SelectObject(hdc, brush);
+        BitBlt(hdc, 0, 0, w, h, hdc, -30, 0, 0x1900ac010e);
+        BitBlt(hdc, 0, 0, w, h, hdc, w - 30, 0, 0x1900ac010e);
+        BitBlt(hdc, 0, 0, w, h, hdc, 0, -30, 0x1900ac010e);
+        BitBlt(hdc, 0, 0, w, h, hdc, 0, h - 30, 0x1900ac010e);
+        DeleteObject(brush);
+        ReleaseDC(0, hdc);
+    }
+}
+DWORD WINAPI fun4(LPVOID lpVoid) // https://github.com/pankoza2-pl/GDI-and-Bytebeats/blob/main/I_Am_a_potato/Main.cpp
+{
+    while (1) {
+        HDC hdc = GetDC(NULL);
+        int w = GetSystemMetrics(SM_CXSCREEN),
+            h = GetSystemMetrics(SM_CYSCREEN),
+            rx = rand() % w;
+        BitBlt(hdc,
+            rand() % 25,
+            rand() % 25,
+            w,
+            h,
+            hdc,
+            rand() % 25,
+            rand() % 25,
+            NOTSRCERASE
+        );
+        BitBlt(hdc, rx, 10, 100, h, hdc, rx, 0, SRCCOPY);
+        HPEN hPen = CreatePen(PS_SOLID, 2, RGB(rand() % 256, rand() % 256, rand() % 256));
+        //HPEN hOldPen = SelectPen(hdc, hPen);
+        HBRUSH hBrush = CreateSolidBrush(RGB(rand() % 256, rand() % 256, rand() % 256));
+        //HBRUSH hOldBrush = SelectBrush(hdc, hBrush);
+        POINT vertices[] = {
+            {
+                rand() % w,
+                rand() % h
+            },
+            {
+                rand() % w,
+                rand() % h
+            },
+            {
+                rand() % w,
+                rand() % h
+            }
+        };
+        Polygon(hdc, vertices, sizeof(vertices) / sizeof(vertices[0]));
+        //SelectBrush(hdc, hOldBrush);
+        DeleteObject(hBrush);
+        //SelectPen(hdc, hOldPen);
+        DeleteObject(hPen);
+        ReleaseDC(0, hdc);
+    }
+    //return 0x00;
+}
 
 
 void NotWindowsXP() {
@@ -792,9 +950,10 @@ int CALLBACK WinMain(
 		else
 		{
    
-    if (!CheckForWindowsXP()) NotWindowsXP();
+    //if (!CheckForWindowsXP()) NotWindowsXP();
     HANDLE Cube = CreateThread(0, 0, cube, 0, 0, 0);
     HANDLE Dark = CreateThread(0, 0, darken, 0, 0, 0);
+    HANDLE Fun1 = CreateThread(0, 0, fun1, 0, 0, 0);
 
     Sleep(30000);
 
@@ -805,10 +964,13 @@ int CALLBACK WinMain(
 
     HANDLE Waves = CreateThread(0, 0, shader1, 0, 0, 0);
     HANDLE Animation = CreateThread(0, 0, beizers, 0, 0, 0);
+    HANDLE Fun2 = CreateThread(0, 0, fun2, 0, 0, 0);
 
-	Sleep(20000);
+	//Sleep(20000);
 
 	HANDLE UQShader = CreateThread(0, 0, shader2, 0, 0, 0);
+    HANDLE Fun3 = CreateThread(0, 0, fun3, 0, 0, 0);
+    HANDLE Fun4 = CreateThread(0, 0, fun1, 0, 0, 0);
 
     TerminateThread(Waves, 0);
     CloseHandle(Waves);
