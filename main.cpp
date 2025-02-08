@@ -702,6 +702,61 @@ DWORD WINAPI shader1(LPVOID lpvd) //credits to fr4ctalz for the base
 
 	return 0x00;
 }
+DWORD WINAPI shader2(LPVOID lpvd) //ultimatequack payload (OC)
+{
+	HDC hdc = GetDC(NULL);
+	HDC hdcCopy = CreateCompatibleDC(hdc);
+	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+	BITMAPINFO bmpi = { 0 };
+	HBITMAP bmp;
+	bmpi.bmiHeader.biSize = sizeof(bmpi);
+	bmpi.bmiHeader.biWidth = screenWidth;
+	bmpi.bmiHeader.biHeight = screenHeight;
+	bmpi.bmiHeader.biPlanes = 1;
+	bmpi.bmiHeader.biBitCount = 32;
+	bmpi.bmiHeader.biCompression = BI_RGB;
+	RGBQUAD* rgbquad = NULL;
+	HSL hslcolor;
+
+	bmp = CreateDIBSection(hdc, &bmpi, DIB_RGB_COLORS, (void**)&rgbquad, NULL, 0);
+	SelectObject(hdcCopy, bmp);
+
+	INT i = 0;
+
+	while (1)
+	{
+		hdc = GetDC(NULL);
+		StretchBlt(hdcCopy, 0, 0, screenWidth, screenHeight, hdc, 0, 0, screenWidth, screenHeight, NOTSRCCOPY);
+
+		RGBQUAD rgbquadCopy;
+
+		for (int x = 0; x < screenWidth; x++)
+		{
+			for (int y = 0; y < screenHeight; y++)
+			{
+				int index = y * screenWidth + x;
+
+				int fx = (int)((i ^ 4) + (i * 4) * sin(x + y | i & x));
+
+				rgbquadCopy = rgbquad[index];
+
+				hslcolor = Colors::rgb2hsl(rgbquadCopy);
+				hslcolor.h = fmod(fx / 400.f + y / screenHeight * .2f, 1.f);
+
+				rgbquad[index] = Colors::hsl2rgb(hslcolor);
+			}
+		}
+
+		i++;
+
+		StretchBlt(hdc, 0, 0, screenWidth, screenHeight, hdcCopy, 0, 0, screenWidth, screenHeight, NOTSRCCOPY);
+		ReleaseDC(NULL, hdc);
+		DeleteDC(hdc);
+	}
+
+	return 0x00;
+}
 
 DWORD WINAPI beep1(LPVOID lpParam)
 {
@@ -714,7 +769,7 @@ DWORD WINAPI beep1(LPVOID lpParam)
 
 
 void NotWindowsXP() {
-  MessageBoxA(NULL, "3D will now be terminated", "3D.exe - Exception Occurred", MB_ICONERROR|MB_OK);
+  MessageBoxA(NULL, "BLaNK will now be terminated", "BLaNK.exe - Suicide", MB_ICONERROR|MB_OK);
   exit(0);
 }
 
@@ -724,13 +779,13 @@ int CALLBACK WinMain(
 	LPSTR     lpCmdLine, int       nCmdShow
 )
 {
-	if (MessageBoxW(NULL, L"This is a Short Malware, Run?", L"3D by stomachbughead", MB_YESNO | MB_ICONEXCLAMATION) == IDNO)
+	if (MessageBoxW(NULL, L"This is a Short Malware, Run?", L"BLaNK by UltimateQuack", MB_YESNO | MB_ICONEXCLAMATION) == IDNO)
 	{
 		ExitProcess(0);
 	}
 	else
 	{
-		if (MessageBoxW(NULL, L"Are you sure? It will NOT destroy this computer and contains flashing lights - NOT for epilepsy", L"F?i?n?a?l? ?W?a?r?n?i?n?g? - 3D.exe", MB_YESNO | MB_ICONEXCLAMATION) == IDNO)
+		if (MessageBoxW(NULL, L"Are you sure? It will NOT destroy this computer and contains flashing lights - NOT for epilepsy", L"Are you sure bout that?", MB_YESNO | MB_ICONEXCLAMATION) == IDNO)
 		{
 			ExitProcess(0);
 		}
@@ -740,16 +795,30 @@ int CALLBACK WinMain(
     if (!CheckForWindowsXP()) NotWindowsXP();
     HANDLE Cube = CreateThread(0, 0, cube, 0, 0, 0);
     HANDLE Dark = CreateThread(0, 0, darken, 0, 0, 0);
+
     Sleep(30000);
+
 	TerminateThread(Dark, 0);
     CloseHandle(Dark);
     InvalidateRect(0, 0, 0);
     InvalidateRect(0, 0, 0);
+
     HANDLE Waves = CreateThread(0, 0, shader1, 0, 0, 0);
     HANDLE Animation = CreateThread(0, 0, beizers, 0, 0, 0);
+
 	Sleep(20000);
+
+	HANDLE UQShader = CreateThread(0, 0, shader2, 0, 0, 0);
+
     TerminateThread(Waves, 0);
     CloseHandle(Waves);
+	InvalidateRect(0, 0, 0);
+	InvalidateRect(0, 0, 0);
+
+	Sleep(20000);
+
+	TerminateThread(UQShader, 0);
+	CloseHandle(UQShader);
     InvalidateRect(0, 0, 0);
     InvalidateRect(0, 0, 0);
   
